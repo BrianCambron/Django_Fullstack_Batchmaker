@@ -39,10 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #3rd party
-
+    'rest_framework',
 
     #Local
     'accounts.apps.AccountsConfig',
+    'api.apps.ApiConfig',
+    'frontend.apps.FrontendConfig',
+    'recipes.apps.RecipesConfig',
 ]
 
 MIDDLEWARE = [
