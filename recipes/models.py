@@ -10,11 +10,18 @@ class Recipe(models.Model):
     DINNER = 'DNR'
     DESSERT = 'DSSRT'
 
+    FAHRENHEIT = 'F'
+    CELCIUS = 'C'
+
     CATEGORY_CHOICES = {
         (BREAKFAST, 'Breakfast'),
         (LUNCH, 'Lunch'),
         (DINNER, 'Dinner'),
         (DESSERT, 'Dessert'),
+    }
+    TEMP_SCALE = {
+        (FAHRENHEIT, 'Fahrenheit'),
+        (CELCIUS, 'Celcius'),
     }
 
     name = models.CharField(max_length = 255)
@@ -24,6 +31,12 @@ class Recipe(models.Model):
     notes = models.TextField(blank=True)
     isPublic = models.BooleanField(default = False)
     category = models.CharField(max_length=255, choices=CATEGORY_CHOICES, default=DESSERT,)
+    amount = models.IntegerField(null=True)
+    prep_time = models.IntegerField(null=True)
+    cook_time = models.IntegerField(null=True)
+    cook_temp = models.IntegerField(null=True)
+    cook_temp = models.IntegerField(null=True)
+    temperature = models.CharField(max_length=255, choices=TEMP_SCALE, default=FAHRENHEIT,)
 
     def __str__(self):
         return self.name
