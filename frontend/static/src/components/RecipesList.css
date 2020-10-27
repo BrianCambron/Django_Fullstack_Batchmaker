@@ -1,0 +1,11 @@
+.recipe-list{
+  display: flex;
+  flex-wrap: wrap;
+}
+.add-recipe{
+  width: 15rem;
+  height: 276px;
+}
+.add-sign{
+  font-size: 250%;
+}

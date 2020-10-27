@@ -35,7 +35,6 @@ class Recipe(models.Model):
     prep_time = models.IntegerField(null=True)
     cook_time = models.IntegerField(null=True)
     cook_temp = models.IntegerField(null=True)
-    cook_temp = models.IntegerField(null=True)
     temperature = models.CharField(max_length=255, choices=TEMP_SCALE, default=FAHRENHEIT,)
 
     def __str__(self):
