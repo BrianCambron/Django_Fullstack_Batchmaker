@@ -3,6 +3,7 @@ import RecipesList from './components/RecipesList';
 import RegisterForm from './components/RegisterForm';
 import LoginForm from './components/LoginForm';
 import RecipeForm from './components/RecipeForm';
+import FullRecipe from './components/FullRecipe';
 import Cookies from 'js-cookie';
 import './App.css';
 
@@ -13,11 +14,14 @@ class App extends Component {
     this.state = {
       recipes: [],
       display: 'home',
+      pickedRecipe:{},
       isLoggedIn: Cookies.get('Authorization')? true: false,
     }
     this.registerUser = this.registerUser.bind(this)
     this.logIn = this.logIn.bind(this)
     this.logOut = this.logOut.bind(this)
+    this.pickRecipe = this.pickRecipe.bind(this)
+    this.addRecipe = this.addRecipe.bind(this)
   }
 
   async componentDidMount(){
@@ -96,27 +100,36 @@ class App extends Component {
     const handleError = (err) => console.warn(err);
     const response = await fetch('api/v1/recipes/', options)
     const data = await response.json().catch(handleError)
+    console.log(data);
     const recipes = [...this.state.recipes, data];
-    this.setState({recipes});
+    this.setState({recipes})
+  }
+  pickRecipe(id){
+    const fullRecipe = this.state.recipes.find(recipe => recipe.id === id);
+    this.setState({pickedRecipe: fullRecipe, display: 'pickedRecipe'});
+    console.log(this.state.pickedRecipe);
   }
 
   render(){
+    const isLoggedIn = this.state.isLoggedIn;
     let html;
     const display = this.state.display;
     if(display === 'register'){
       html = <RegisterForm registerUser={this.registerUser}/>
     }
     else if (display === 'home') {
-      html = <div className="my-recipes"><button className="btn btn-secondary add-recipe mr-2" onClick={() => this.setState({display:'form'})}><p className="add-sign">&#x2b;</p><p>Add Recipe</p></button>
-              <RecipesList recipes={this.state.recipes}/></div>
+      html = <div className="my-recipes">{isLoggedIn? <button className="btn btn-secondary add-recipe mr-2" onClick={() => this.setState({display:'form'})}><p className="add-sign">&#x2b;</p><p>Add Recipe</p></button>:<button className="btn btn-secondary add-recipe mr-2"onClick={() => alert('Need to be signed in')}><p className="add-sign">&#x2b;</p><p>Add Recipe</p></button>}
+              <RecipesList recipes={this.state.recipes} pickRecipe={this.pickRecipe}/></div>
     }
     else if (display === 'login') {
       html = <LoginForm logIn={this.logIn}/>
     }
     else if (display === 'form') {
-      html = <RecipeForm />
+      html = <RecipeForm addRecipe={this.addRecipe}/>
     }
-    const isLoggedIn = this.state.isLoggedIn;
+    else if (display === 'pickedRecipe'){
+      html = <FullRecipe pickedRecipe={this.state.pickedRecipe}/>
+    }
     return(
       <>
       <nav className="navbar navbar-light" style={{backgroundColor: '#C0C0C0'}}>
@@ -125,7 +138,7 @@ class App extends Component {
       <div>
         <button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'home'})}}>HomePage</button>
         {isLoggedIn === false?<button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'register'})}}>Register</button>
-        : ''}
+        : <button className="mr-1 btn btn-secondary">View All</button>}
         {isLoggedIn === false?<button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'login'})}}>Log in</button>
         :<button className="mr-1 btn btn-secondary"type='button'onClick={this.logOut}>Log out</button>}
       </div>

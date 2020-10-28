@@ -3,7 +3,7 @@ import './RecipesList.css';
 function RecipeItem(props){
   return(
     <>
-    <div className="card text-black bg-secondary mb-2 mr-2" style={{width: '15rem', height: '276px'}}>
+    <div onClick={() => props.pickRecipe(props.recipe.id)}className="card text-black bg-secondary mb-2 mr-2" style={{width: '15rem', height: '276px'}}>
       <div className="card-body">
         <h5 className="card-title">{props.recipe.name}</h5>
       </div>
@@ -21,7 +21,7 @@ function RecipeItem(props){
 
 
 function RecipesList(props){
-    const recipes = props.recipes.map(recipe => <RecipeItem key={recipe.id} recipe={recipe}/>).slice(1,5);
+    const recipes = props.recipes.map(recipe => <RecipeItem key={recipe.id} recipe={recipe} pickRecipe={props.pickRecipe}/>).slice(1,5);
     return(
       <div className="recipe-list">
             {recipes}

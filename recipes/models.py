@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 
@@ -29,12 +29,12 @@ class Recipe(models.Model):
     ingredients = models.TextField()
     instructions = models.TextField()
     notes = models.TextField(blank=True)
-    isPublic = models.BooleanField(default = False)
+    is_public = models.BooleanField(default = False)
     category = models.CharField(max_length=255, choices=CATEGORY_CHOICES, default=DESSERT,)
-    amount = models.IntegerField(null=True)
-    prep_time = models.IntegerField(null=True)
-    cook_time = models.IntegerField(null=True)
-    cook_temp = models.IntegerField(null=True)
+    amount = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(1000)], null=True)
+    prep_time = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(1000)], null=True)
+    cook_time = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(1000)], null=True)
+    cook_temp = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(1000)], null=True)
     temperature = models.CharField(max_length=255, choices=TEMP_SCALE, default=FAHRENHEIT,)
 
     def __str__(self):
