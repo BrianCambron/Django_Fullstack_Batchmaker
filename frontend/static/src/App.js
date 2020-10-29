@@ -22,8 +22,8 @@ class App extends Component {
     this.logIn = this.logIn.bind(this)
     this.logOut = this.logOut.bind(this)
     this.pickRecipe = this.pickRecipe.bind(this)
-    this.addRecipe = this.addRecipe.bind(this)
     this.deleteRecipe = this.deleteRecipe.bind(this)
+    this.editRecipe = this.editRecipe.bind(this)
   }
 
   async componentDidMount(){
@@ -89,23 +89,7 @@ class App extends Component {
     }
   }
 
-  async addRecipe(e, obj){
-    e.preventDefault();
-    const options = {
-      method:'POST',
-      headers: {
-        'X-CSRFToken': Cookies.get('csrftoken'),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(obj),
-    };
-    const handleError = (err) => console.warn(err);
-    const response = await fetch('api/v1/recipes/', options)
-    const data = await response.json().catch(handleError)
-    console.log(data);
-    const recipes = [...this.state.recipes, data];
-    this.setState({recipes})
-  }
+
   pickRecipe(id){
     const fullRecipe = this.state.recipes.find(recipe => recipe.id === id);
     this.setState({pickedRecipe: fullRecipe, display: 'pickedRecipe'});
@@ -129,6 +113,23 @@ class App extends Component {
     recipes.splice(index,1);
     this.setState({recipes})
     }
+  async editRecipe(obj, id){
+    const options = {
+      method:'PUT',
+      headers:{
+        'X-CSRFToken': Cookies.get('csrftoken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(obj),
+    };
+     const handleError = (err) => console.warn(err);
+     const response = await fetch(`api/v1/recipes/${id}/`, options)
+     const data = await response.json().catch(handleError)
+     const recipes = [...this.state.recipes];
+     const index = recipes.findIndex(recipe => recipe.id === id);
+     recipes[index] = data;
+     this.setState({recipes})
+  }
 
   render(){
     const isLoggedIn = this.state.isLoggedIn;
@@ -145,10 +146,10 @@ class App extends Component {
       html = <LoginForm logIn={this.logIn}/>
     }
     else if (display === 'form') {
-      html = <RecipeForm addRecipe={this.addRecipe}/>
+      html = <RecipeForm recipes={this.state.recipes}/>
     }
     else if (display === 'pickedRecipe'){
-      html = <FullRecipe pickedRecipe={this.state.pickedRecipe} deleteRecipe={this.deleteRecipe}/>
+      html = <FullRecipe pickedRecipe={this.state.pickedRecipe} deleteRecipe={this.deleteRecipe} editRecipe={this.editRecipe}/>
     }
     else if (display === 'AllRecipes'){
       html = <AllRecipes recipes={this.state.recipes} pickRecipe={this.pickRecipe}/>
@@ -159,7 +160,7 @@ class App extends Component {
       <p style={{fontStyle: 'italic'}}>The kitchen is yours, chef!</p>
       <h5 style={{color:'#6B6B6B'}}>BATCH MAKER</h5>
       <div>
-        <button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'home'})}}>HomePage</button>
+        <button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'home'})}}><i className="fas fa-home"></i></button>
         {isLoggedIn === false?<button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'register'})}}>Register</button>
         : <button className="mr-1 btn btn-secondary" onClick={() =>  {this.setState({display:'AllRecipes'})}}>View All</button>}
         {isLoggedIn === false?<button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'login'})}}>Log in</button>
@@ -169,7 +170,7 @@ class App extends Component {
       <div className="my-recipes">
         {html}
       </div>
-      </>
+     </>
     )
   }
 }
