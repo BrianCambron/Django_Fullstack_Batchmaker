@@ -25,6 +25,7 @@ class Recipe(models.Model):
     }
 
     name = models.CharField(max_length = 255)
+    image = models.ImageField(upload_to='recipes/', blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ingredients = models.TextField()
     instructions = models.TextField()

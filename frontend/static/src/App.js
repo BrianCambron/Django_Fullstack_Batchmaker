@@ -4,6 +4,7 @@ import RegisterForm from './components/RegisterForm';
 import LoginForm from './components/LoginForm';
 import RecipeForm from './components/RecipeForm';
 import FullRecipe from './components/FullRecipe';
+import AllRecipes from './components/AllRecipes';
 import Cookies from 'js-cookie';
 import './App.css';
 
@@ -22,6 +23,7 @@ class App extends Component {
     this.logOut = this.logOut.bind(this)
     this.pickRecipe = this.pickRecipe.bind(this)
     this.addRecipe = this.addRecipe.bind(this)
+    this.deleteRecipe = this.deleteRecipe.bind(this)
   }
 
   async componentDidMount(){
@@ -110,6 +112,24 @@ class App extends Component {
     console.log(this.state.pickedRecipe);
   }
 
+  async deleteRecipe(id){
+    const options = {
+      method: 'DELETE',
+      headers:{
+        'X-CSRFToken': Cookies.get('csrftoken'),
+        'Content-Type': 'application/json'
+      },
+    }
+    const handleError = (err) => console.warn(err);
+    const response = await fetch(`api/v1/recipes/${id}/`, options)
+    const data = await response.json().catch(handleError)
+    console.log(data);
+    const recipes = [...this.state.recipes]
+    const index = recipes.findIndex(recipe => recipe.id === id)
+    recipes.splice(index,1);
+    this.setState({recipes})
+    }
+
   render(){
     const isLoggedIn = this.state.isLoggedIn;
     let html;
@@ -128,7 +148,10 @@ class App extends Component {
       html = <RecipeForm addRecipe={this.addRecipe}/>
     }
     else if (display === 'pickedRecipe'){
-      html = <FullRecipe pickedRecipe={this.state.pickedRecipe}/>
+      html = <FullRecipe pickedRecipe={this.state.pickedRecipe} deleteRecipe={this.deleteRecipe}/>
+    }
+    else if (display === 'AllRecipes'){
+      html = <AllRecipes recipes={this.state.recipes} pickRecipe={this.pickRecipe}/>
     }
     return(
       <>
@@ -138,7 +161,7 @@ class App extends Component {
       <div>
         <button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'home'})}}>HomePage</button>
         {isLoggedIn === false?<button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'register'})}}>Register</button>
-        : <button className="mr-1 btn btn-secondary">View All</button>}
+        : <button className="mr-1 btn btn-secondary" onClick={() =>  {this.setState({display:'AllRecipes'})}}>View All</button>}
         {isLoggedIn === false?<button className="mr-1 btn btn-secondary"type='button'onClick={() => {this.setState({display:'login'})}}>Log in</button>
         :<button className="mr-1 btn btn-secondary"type='button'onClick={this.logOut}>Log out</button>}
       </div>
